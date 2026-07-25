@@ -76,6 +76,14 @@ export default function StaffDashboard() {
                 Kelola Hadiah
               </Link>
             )}
+            {me?.staffRole === "owner" && (
+              <Link
+                href="/staff/dashboard/staff"
+                className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
+              >
+                Kelola Staff
+              </Link>
+            )}
             <button
               onClick={() => setShowPasswordForm((s) => !s)}
               className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
