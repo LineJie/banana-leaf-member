@@ -13,6 +13,9 @@ export async function middleware(request) {
     if (pathname.startsWith("/staff/dashboard/rewards") && session.staffRole !== "owner") {
       return NextResponse.redirect(new URL("/staff/dashboard", request.url));
     }
+    if (pathname.startsWith("/staff/dashboard/staff") && session.staffRole !== "owner") {
+      return NextResponse.redirect(new URL("/staff/dashboard", request.url));
+    }
   }
 
   if (pathname.startsWith("/member/dashboard")) {
