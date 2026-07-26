@@ -42,7 +42,7 @@ export default function StaffInsights() {
   }
 
   function waLink(m) {
-      const message = `Halo ${m.name}, poin Banana Leaf kamu sebanyak ${m.points} akan hangus dalam ${daysUntil(m.nearestExpiry)} hari. Yuk tukarkan sebelum hangus!`;
+      const message = `Halo ${m.name}, poin Banana Leaf kamu sebanyak ${m.points} akan hangus dalam ${daysUntil(m.nearestExpiry)} hari. Yuk tukarkan sebelum hangus! Cek & tukar poin kamu di https://bananaleaf-member.netlify.app/member/login (login pakai nomor WhatsApp ini + PIN kamu).`;
       return `https://wa.me/${m.whatsappNumber}?text=${encodeURIComponent(message)}`;
   }
 
