@@ -25,9 +25,11 @@ export default function HomePage() {
 
       <div className="relative w-full max-w-3xl">
         <div className="mb-12 text-center">
-          <p className="font-body text-gold-300 text-xs tracking-[0.3em] uppercase mb-4">
-            Banana Leaf
-          </p>
+          <img
+            src="/logo-banana-leaf.png"
+            alt="Banana Leaf"
+            className="mx-auto h-14 w-auto mb-4"
+          />
           <h1 className="font-display text-4xl sm:text-5xl text-leaf-50 leading-tight">
             Membership &amp; Poin
           </h1>
