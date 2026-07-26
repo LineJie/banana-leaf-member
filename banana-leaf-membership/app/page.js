@@ -28,7 +28,7 @@ export default function HomePage() {
           <img
             src="/logo-banana-leaf.png"
             alt="Banana Leaf"
-            className="mx-auto h-14 w-auto mb-4"
+            className="mx-auto w-[420px] max-w-full h-auto mb-4"
           />
           <h1 className="font-display text-4xl sm:text-5xl text-leaf-50 leading-tight">
             Membership &amp; Poin
