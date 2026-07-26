@@ -68,6 +68,12 @@ export default function StaffDashboard() {
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Link
+              href="/staff/dashboard/insights"
+              className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
+            >
+              Perlu Diperhatikan
+            </Link>
             {me?.staffRole === "owner" && (
               <Link
                 href="/staff/dashboard/rewards"
