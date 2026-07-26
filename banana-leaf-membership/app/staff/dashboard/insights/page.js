@@ -41,6 +41,11 @@ export default function StaffInsights() {
     return Math.floor(diff / (24 * 60 * 60 * 1000));
   }
 
+  function waLink(m) {
+      const message = `Halo ${m.name}, poin Banana Leaf kamu sebanyak ${m.points} akan hangus dalam ${daysUntil(m.nearestExpiry)} hari. Yuk tukarkan sebelum hangus!`;
+      return `https://wa.me/${m.whatsappNumber}?text=${encodeURIComponent(message)}`;
+  }
+
   return (
     <main className="min-h-screen bg-[#fbf9f4] px-4 py-6 sm:px-6 sm:py-10">
       <div className="max-w-4xl mx-auto">
@@ -103,6 +108,7 @@ export default function StaffInsights() {
                         hangus {daysUntil(m.nearestExpiry)} hari lagi
                       </p>
                     </div>
+                      <a href={waLink(m)} target="_blank" rel="noopener noreferrer" className="focus-ring rounded-lg bg-green-600 px-3 py-2 font-body text-xs text-white hover:bg-green-700 whitespace-nowrap">Chat WA</a>
                   </div>
                 ))}
               </div>
