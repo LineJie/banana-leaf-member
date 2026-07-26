@@ -51,10 +51,8 @@ export async function POST(request) {
       );
     }
 
-    // PIN dibikin acak (BUKAN dari nomor WA-nya sendiri), soalnya nomor WA itu
-    // juga dipakai sebagai username login — kalau PIN default = 4 digit terakhir
-    // nomor itu, siapapun yang tau nomor WA member otomatis tau PIN-nya juga.
-    const defaultPin = String(randomInt(100000, 999999));
+    // PIN default = 4 digit terakhir nomor WhatsApp member (sesuai kesepakatan owner).
+    const defaultPin = waNumber.slice(-4);
     const pinHash = await hashSecret(defaultPin);
 
     const { data: member, error } = await supabase
@@ -69,7 +67,7 @@ export async function POST(request) {
       ok: true,
       member,
       defaultPin,
-      note: "Kasih tau member: login pakai nomor WhatsApp ini + PIN acak di atas. Member bisa ganti PIN sendiri di halaman login member.",
+      note: "Kasih tau member: login pakai nomor WhatsApp ini + PIN default (4 digit terakhir nomor WA) di atas. Member bisa ganti PIN sendiri di halaman login member.",
     });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
