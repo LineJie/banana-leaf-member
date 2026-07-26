@@ -23,11 +23,13 @@ export async function GET(request) {
     }
 
     const summary = await getMemberPointsSummary({ supabase, memberId: member.id });
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
     const { data: history } = await supabase
       .from("transactions")
       .select("*")
       .eq("member_id", member.id)
+      .gte("created_at", ninetyDaysAgo)
       .order("created_at", { ascending: false })
       .limit(50);
 
