@@ -80,6 +80,12 @@ export default function StaffDashboard() {
             >
               Input Hari Ini
             </Link>
+  <Link
+                href="/staff/dashboard/yesterday"
+                className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
+              >
+                                Input Transaksi Kemaren
+                  </Link>
             {me?.staffRole === "owner" && (
               <Link
                 href="/staff/dashboard/rewards"
