@@ -42,11 +42,11 @@ export default function StaffInsights() {
   }
 
   function waLink(m) {
-      const message = `Halo ${m.name}, poin Banana Leaf kamu sebanyak ${m.points} akan hangus dalam ${daysUntil(m.nearestExpiry)} hari. Yuk tukarkan sebelum hangus! Cek & tukar poin kamu di https://bananaleaf-member.netlify.app/member/login (login pakai nomor WhatsApp ini + PIN kamu).`;
+      const message = `Halo ${m.name}, poin Banana Leaf kamu sebanyak ${m.points} akan hangus dalam ${daysUntil(m.nearestExpiry)} hari. Yuk tukarkan sebelum hangus! Cek & tukar poin kamu di https://bananaleaf.biz.id/member/login (login pakai nomor WhatsApp ini + PIN kamu).`;
       return `https://wa.me/${m.whatsappNumber}?text=${encodeURIComponent(message)}`;
   }
 
-  function waLinkInactive(m) { const message = `Hi ${m.name}! Jujur deh, kami kangen banget liat kamu makan di sini 😋🍃\n\nMakanya, ada Welcome Back Bonus khusus buat kamu: 1 Jamur Enoki Cabe Garam GRATIS! 🍄🔥\n\nTinggal tunjukin chat ini ke staf kami pas kamu dine-in. Jangan sampai ketinggalan ya, voucher ini cuma bisa diklaim sampai 15 Agustus 2026!\n\nCatatan: Khusus dine-in & tidak bisa digabung dengan promo lainnya.\n\nSee you soon di Banana Leaf! 🍽️`; return `https://wa.me/${m.whatsappNumber}?text=${encodeURIComponent(message)}`; }
+  function waLinkInactive(m) { const message = `Hi ${m.name}! Jujur deh, kami kangen banget liat kamu makan di sini 😋🍃\n\nMakanya, ada Welcome Back Bonus khusus buat kamu: 1 Jamur Enoki Cabe Garam GRATIS! 🍄🔥\n\nTinggal tunjukin chat ini ke staf kami pas kamu dine-in. Jangan sampai ketinggalan ya, voucher ini cuma bisa diklaim sampai 15 September 2026!\n\nCatatan: Khusus dine-in & tidak bisa digabung dengan promo lainnya.\n\nSee you soon di Banana Leaf! 🍽️`; return `https://wa.me/${m.whatsappNumber}?text=${encodeURIComponent(message)}`; }
 
   return (
     <main className="min-h-screen bg-[#fbf9f4] px-4 py-6 sm:px-6 sm:py-10">
