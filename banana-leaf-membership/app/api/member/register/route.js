@@ -27,8 +27,8 @@ export async function POST(request) {
     }
 
     const waNumber = normalizeWhatsapp(whatsapp);
-    // Validasi ketat: harus format 62xxxxxxxxxx (11-13 digit total termasuk kode negara)
-    const isValidFormat = /^62[0-9]{9,11}$/.test(waNumber);
+    // Validasi: format 62xxxxxxxxx; nomor seluler Indonesia bisa sampai 12 digit setelah 62 (mis. 0895xxxxxxxxx)
+    const isValidFormat = /^62[0-9]{9,12}$/.test(waNumber);
     if (!isValidFormat || waNumber.length < 11) {
       return NextResponse.json(
         { error: "Nomor WhatsApp tidak valid. Gunakan format: 0812xxxxxxxx atau 62812xxxxxxx" },
