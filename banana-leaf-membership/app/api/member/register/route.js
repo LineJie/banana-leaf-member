@@ -30,10 +30,10 @@ export async function POST(request) {
     // Validasi ketat: harus format 62xxxxxxxxxx (11-13 digit total termasuk kode negara)
     const isValidFormat = /^62[0-9]{9,11}$/.test(waNumber);
     if (!isValidFormat || waNumber.length < 11) {
-      return NextResponse.json({
-        error: "Nomor WhatsApp tidak valid. Gunakan format: 0812xxxxxxxx atau 62812xxxxxxx",
-        status: 400,
-      });
+      return NextResponse.json(
+        { error: "Nomor WhatsApp tidak valid. Gunakan format: 0812xxxxxxxx atau 62812xxxxxxx" },
+        { status: 400 }
+      );
     }
 
     const supabase = supabaseAdmin();

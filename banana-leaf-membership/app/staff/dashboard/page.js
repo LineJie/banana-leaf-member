@@ -287,7 +287,7 @@ function RegisterMemberForm({ onRegistered }) {
         body: JSON.stringify({ whatsapp, name }),
       });
       const data = await res.json();
-      if (!res.ok) {
+      if (!res.ok || data.error || !data.member) {
         setError(data.error || "Gagal daftar member.");
         return;
       }
