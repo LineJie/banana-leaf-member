@@ -21,12 +21,23 @@ export async function POST(request) {
     const supabase = supabaseAdmin();
     const { data: member } = await supabase
       .from("members")
-      .select("id, pin_hash")
+      .select("id, pin_hash, whatsapp_number")
       .eq("id", session.memberId)
       .maybeSingle();
 
     if (!member) {
       return NextResponse.json({ error: "Member tidak ditemukan." }, { status: 404 });
+    }
+
+    if (String(newPin) === String(currentPin)) {
+      return NextResponse.json({ error: "PIN baru harus berbeda dari PIN lama." }, { status: 400 });
+    }
+    // 4 digit terakhir nomor WA = PIN default yang diketahui staff, jadi tidak boleh dipakai lagi.
+    if (String(newPin) === String(member.whatsapp_number).slice(-4)) {
+      return NextResponse.json(
+        { error: "PIN baru tidak boleh sama dengan 4 digit terakhir nomor WhatsApp." },
+        { status: 400 }
+      );
     }
 
     const valid = await compareSecret(String(currentPin), member.pin_hash);
@@ -37,7 +48,7 @@ export async function POST(request) {
     const newHash = await hashSecret(String(newPin));
     const { error } = await supabase
       .from("members")
-      .update({ pin_hash: newHash })
+      .update({ pin_hash: newHash, must_change_pin: false })
       .eq("id", member.id);
 
     if (error) throw error;

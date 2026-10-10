@@ -51,7 +51,11 @@ export async function POST(request) {
       "30d"
     );
 
-    const res = NextResponse.json({ ok: true, name: member.name });
+    const res = NextResponse.json({
+      ok: true,
+      name: member.name,
+      mustChangePin: Boolean(member.must_change_pin),
+    });
     res.cookies.set(MEMBER_COOKIE, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

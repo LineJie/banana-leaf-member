@@ -36,6 +36,31 @@ export default function MemberDashboard() {
     );
   }
 
+  if (data.mustChangePin) {
+    return (
+      <main className="min-h-screen bg-[#fbf9f4] px-4 py-6 sm:px-6 sm:py-10">
+        <div className="max-w-lg mx-auto">
+          <p className="font-body text-xs text-ink/40 uppercase tracking-wide">
+            Banana Leaf Membership
+          </p>
+          <h1 className="font-display text-2xl text-ink mt-1 mb-2">Halo, {data.member.name}</h1>
+          <p className="font-body text-sm text-ink/60">
+            Demi keamanan akunmu, ganti PIN dulu sebelum lanjut. PIN lama adalah PIN dari
+            staf (4 digit terakhir nomor WhatsApp atau PIN dari reset), jadi perlu diganti
+            dengan PIN pilihanmu sendiri.
+          </p>
+          <ChangePinForm forced onDone={load} />
+          <button
+            onClick={handleLogout}
+            className="focus-ring mt-4 font-body text-sm text-ink/50 hover:text-ink"
+          >
+            Keluar
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#fbf9f4] px-4 py-6 sm:px-6 sm:py-10">
       <div className="max-w-lg mx-auto">
@@ -131,7 +156,7 @@ export default function MemberDashboard() {
   );
 }
 
-function ChangePinForm({ onDone }) {
+function ChangePinForm({ onDone, forced = false }) {
   const [currentPin, setCurrentPin] = useState("");
   const [newPin, setNewPin] = useState("");
   const [msg, setMsg] = useState("");
@@ -154,7 +179,7 @@ function ChangePinForm({ onDone }) {
     setMsg("PIN berhasil diganti.");
     setCurrentPin("");
     setNewPin("");
-    setTimeout(onDone, 1200);
+    setTimeout(onDone, forced ? 600 : 1200);
   }
 
   return (
@@ -187,7 +212,7 @@ function ChangePinForm({ onDone }) {
         type="submit"
         className="focus-ring rounded-lg bg-leaf-700 hover:bg-leaf-800 text-white font-body text-sm font-medium px-4 py-2"
       >
-        Simpan PIN baru
+        {forced ? "Simpan PIN & lanjut" : "Simpan PIN baru"}
       </button>
     </form>
   );

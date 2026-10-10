@@ -32,7 +32,7 @@ export async function POST(request, { params }) {
 
     const { error: updateErr } = await supabase
       .from("members")
-      .update({ pin_hash: pinHash })
+      .update({ pin_hash: pinHash, must_change_pin: true })
       .eq("id", id);
 
     if (updateErr) throw updateErr;

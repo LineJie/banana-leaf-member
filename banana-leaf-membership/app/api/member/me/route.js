@@ -13,7 +13,7 @@ export async function GET(request) {
     const supabase = supabaseAdmin();
     const { data: member, error } = await supabase
       .from("members")
-      .select("id, whatsapp_number, name, created_at")
+      .select("*")
       .eq("id", session.memberId)
       .maybeSingle();
 
@@ -35,7 +35,13 @@ export async function GET(request) {
 
     return NextResponse.json({
       ok: true,
-      member,
+      member: {
+        id: member.id,
+        whatsapp_number: member.whatsapp_number,
+        name: member.name,
+        created_at: member.created_at,
+      },
+      mustChangePin: Boolean(member.must_change_pin),
       totalPoints: summary.totalPoints,
       expiringSoonPoints: summary.expiringSoonPoints,
       expiringSoonDate: summary.expiringSoonDate,

@@ -48,3 +48,11 @@ export function normalizeWhatsapp(raw) {
   }
   return digits;
 }
+
+// Format nomor WA yang diterima: 62 + 9 sampai 12 digit (mis. 62895615546664).
+export function isValidWhatsapp(waNumber) {
+  return /^62[0-9]{9,12}$/.test(String(waNumber || ""));
+}
+
+export const WHATSAPP_FORMAT_ERROR =
+  "Nomor WhatsApp tidak valid. Gunakan format: 0812xxxxxxxx atau 62812xxxxxxx";

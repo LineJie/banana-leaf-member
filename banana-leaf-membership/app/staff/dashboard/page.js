@@ -86,6 +86,26 @@ export default function StaffDashboard() {
               >
                                 Input Transaksi Kemaren
                   </Link>
+            <Link
+              href="/staff/dashboard/redemptions"
+              className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
+            >
+              Cek Penukaran Hadiah
+            </Link>
+            <Link
+              href="/staff/dashboard/vouchers"
+              className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
+            >
+              Voucher
+            </Link>
+            {me?.staffRole === "owner" && (
+              <Link
+                href="/staff/dashboard/templates"
+                className="focus-ring font-body text-sm text-gold-600 hover:text-gold-700"
+              >
+                Kelola Pesan WA
+              </Link>
+            )}
             {me?.staffRole === "owner" && (
               <Link
                 href="/staff/dashboard/rewards"
@@ -156,7 +176,7 @@ export default function StaffDashboard() {
             {registerNotice && (
               <div className="rounded-lg border border-leaf-300 bg-leaf-50 px-4 py-3 mb-3 font-body text-sm text-leaf-800">
                 Member <strong>{registerNotice.member.name}</strong> berhasil didaftarkan.
-                PIN default: <strong>{registerNotice.defaultPin}</strong> (kasih tau member ya).
+                PIN default: <strong>{registerNotice.defaultPin}</strong> (kasih tau member ya; saat login pertama dia wajib menggantinya).
               </div>
             )}
 
@@ -273,6 +293,7 @@ function ChangePasswordForm({ onDone }) {
 function RegisterMemberForm({ onRegistered }) {
   const [whatsapp, setWhatsapp] = useState("");
   const [name, setName] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -284,7 +305,7 @@ function RegisterMemberForm({ onRegistered }) {
       const res = await fetch("/api/member/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ whatsapp, name }),
+        body: JSON.stringify({ whatsapp, name, birthDate: birthDate || undefined }),
       });
       const data = await res.json();
       if (!res.ok || data.error || !data.member) {
@@ -294,6 +315,7 @@ function RegisterMemberForm({ onRegistered }) {
       onRegistered(data);
       setWhatsapp("");
       setName("");
+      setBirthDate("");
     } finally {
       setLoading(false);
     }
@@ -322,6 +344,17 @@ function RegisterMemberForm({ onRegistered }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          className="focus-ring w-full rounded-lg border border-ink/15 px-3 py-2 font-body text-sm"
+        />
+      </div>
+      <div>
+        <label className="block font-body text-xs text-ink/60 mb-1">
+          Tanggal lahir (opsional, buat ucapan ulang tahun)
+        </label>
+        <input
+          type="date"
+          value={birthDate}
+          onChange={(e) => setBirthDate(e.target.value)}
           className="focus-ring w-full rounded-lg border border-ink/15 px-3 py-2 font-body text-sm"
         />
       </div>
@@ -432,8 +465,9 @@ function MemberDetail({ detail, onRefresh, isOwner }) {
         {mode === "edit" && (
           <EditMemberForm
             member={detail.member}
-            onDone={() => {
+            onDone={(newPin) => {
               setMode(null);
+              if (newPin) setResetResult(newPin);
               onRefresh();
             }}
           />
@@ -512,25 +546,44 @@ function MemberDetail({ detail, onRefresh, isOwner }) {
 function EditMemberForm({ member, onDone }) {
   const [name, setName] = useState(member.name);
   const [whatsapp, setWhatsapp] = useState(member.whatsapp_number);
+  const [birthDate, setBirthDate] = useState(member.birth_date || "");
+  const [promoOptOut, setPromoOptOut] = useState(Boolean(member.promo_opt_out));
+  const [resetPin, setResetPin] = useState(true);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const numberChanged = whatsapp.replace(/[^0-9]/g, "") !== member.whatsapp_number;
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    if (
+      numberChanged &&
+      !window.confirm(
+        `Ganti nomor ${member.name} dari ${member.whatsapp_number} ke ${whatsapp}? Poin & riwayat tetap aman.`
+      )
+    ) {
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch(`/api/member/${member.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, whatsapp }),
+        body: JSON.stringify({
+          name,
+          whatsapp,
+          birthDate: birthDate || null,
+          promoOptOut,
+          resetPin: numberChanged ? resetPin : undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Gagal simpan perubahan.");
         return;
       }
-      onDone();
+      onDone(data.newPin);
     } finally {
       setLoading(false);
     }
@@ -558,9 +611,42 @@ function EditMemberForm({ member, onDone }) {
           className="focus-ring w-full rounded-lg border border-ink/15 px-3 py-2 font-body text-sm"
         />
         <p className="font-body text-xs text-ink/40 mt-1">
-          Ganti nomor ini juga mengganti nomor login member.
+          Hanya owner yang bisa koreksi nomor. Poin & riwayat tidak berubah; nomor ini juga jadi
+          nomor login member.
         </p>
       </div>
+      {numberChanged && (
+        <label className="flex items-start gap-2 font-body text-xs text-ink/70">
+          <input
+            type="checkbox"
+            checked={resetPin}
+            onChange={(e) => setResetPin(e.target.checked)}
+            className="mt-0.5"
+          />
+          <span>
+            Buat PIN baru untuk member (disarankan). PIN lama dibuat dari nomor yang salah, jadi
+            member tidak akan bisa login dengan nomor yang benar.
+          </span>
+        </label>
+      )}
+      <div>
+        <label className="block font-body text-xs text-ink/60 mb-1">Tanggal lahir (opsional)</label>
+        <input
+          type="date"
+          value={birthDate}
+          onChange={(e) => setBirthDate(e.target.value)}
+          className="focus-ring w-full rounded-lg border border-ink/15 px-3 py-2 font-body text-sm"
+        />
+      </div>
+      <label className="flex items-start gap-2 font-body text-xs text-ink/70">
+        <input
+          type="checkbox"
+          checked={promoOptOut}
+          onChange={(e) => setPromoOptOut(e.target.checked)}
+          className="mt-0.5"
+        />
+        <span>Member minta berhenti dikirimi pesan WA (disembunyikan dari daftar kirim pesan)</span>
+      </label>
       {error && <p className="font-body text-xs text-red-600">{error}</p>}
       <button
         type="submit"

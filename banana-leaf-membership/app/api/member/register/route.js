@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { randomInt } from "crypto";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { getSession, normalizeWhatsapp, STAFF_COOKIE } from "@/lib/session";
+import {
+  getSession,
+  normalizeWhatsapp,
+  isValidWhatsapp,
+  WHATSAPP_FORMAT_ERROR,
+  STAFF_COOKIE,
+} from "@/lib/session";
 import { hashSecret } from "@/lib/hash";
 
 export async function POST(request) {
@@ -11,7 +17,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Harus login sebagai staff." }, { status: 401 });
     }
 
-    const { whatsapp, name } = await request.json();
+    const { whatsapp, name, birthDate } = await request.json();
     if (!whatsapp || !name) {
       return NextResponse.json(
         { error: "Nomor WhatsApp dan nama member wajib diisi." },
@@ -28,12 +34,17 @@ export async function POST(request) {
 
     const waNumber = normalizeWhatsapp(whatsapp);
     // Validasi: format 62xxxxxxxxx; nomor seluler Indonesia bisa sampai 12 digit setelah 62 (mis. 0895xxxxxxxxx)
-    const isValidFormat = /^62[0-9]{9,12}$/.test(waNumber);
-    if (!isValidFormat || waNumber.length < 11) {
-      return NextResponse.json(
-        { error: "Nomor WhatsApp tidak valid. Gunakan format: 0812xxxxxxxx atau 62812xxxxxxx" },
-        { status: 400 }
-      );
+    if (!isValidWhatsapp(waNumber)) {
+      return NextResponse.json({ error: WHATSAPP_FORMAT_ERROR }, { status: 400 });
+    }
+
+    // Tanggal lahir opsional (YYYY-MM-DD), dipakai untuk pesan ulang tahun.
+    let birthDateValue = null;
+    if (birthDate) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(birthDate)) || Number.isNaN(Date.parse(birthDate))) {
+        return NextResponse.json({ error: "Tanggal lahir tidak valid." }, { status: 400 });
+      }
+      birthDateValue = String(birthDate);
     }
 
     const supabase = supabaseAdmin();
@@ -57,17 +68,26 @@ export async function POST(request) {
 
     const { data: member, error } = await supabase
       .from("members")
-      .insert({ whatsapp_number: waNumber, name: name.trim(), pin_hash: pinHash })
+      .insert({
+        whatsapp_number: waNumber,
+        name: name.trim(),
+        pin_hash: pinHash,
+        must_change_pin: true,
+        birth_date: birthDateValue,
+      })
       .select()
       .single();
 
     if (error) throw error;
 
+    // Jangan kirim hash PIN ke browser.
+    const { pin_hash: _pinHash, ...safeMember } = member;
+
     return NextResponse.json({
       ok: true,
-      member,
+      member: safeMember,
       defaultPin,
-      note: "Kasih tau member: login pakai nomor WhatsApp ini + PIN default (4 digit terakhir nomor WA) di atas. Member bisa ganti PIN sendiri di halaman login member.",
+      note: "Kasih tau member: login pakai nomor WhatsApp ini + PIN default (4 digit terakhir nomor WA) di atas. Saat login pertama, member WAJIB mengganti PIN.",
     });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
