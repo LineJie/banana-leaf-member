@@ -68,3 +68,19 @@ export function normalizeVoucherCode(raw) {
   const body = cleaned.replace(/^BL-?/, "");
   return body ? `BL-${body}` : "";
 }
+
+// Kode buatan owner (mis. "BANANA10"). Awalan "BL-" ditambahkan otomatis, jadi
+// owner menulis kodenya TANPA "BL". Badan kode yang diawali "BL" ditolak karena
+// normalisasi membuang awalan "BL" (mis. "BLUE10" akan terbaca "BL-UE10").
+// Mengembalikan { code } kalau valid, atau { error } kalau tidak.
+export function parseCustomCode(raw) {
+  const body = String(raw || "").trim().toUpperCase().replace(/\s+/g, "");
+  if (!body) return { error: "Kode kosong." };
+  if (body.startsWith("BL")) {
+    return { error: "Tulis kode tanpa awalan BL (contoh: BANANA10). Awalan BL- ditambahkan otomatis." };
+  }
+  if (!/^[A-Z0-9]{3,20}$/.test(body)) {
+    return { error: "Kode hanya boleh huruf dan angka, 3-20 karakter (tanpa spasi atau simbol)." };
+  }
+  return { code: `BL-${body}` };
+}
