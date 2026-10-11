@@ -1,7 +1,7 @@
 // Template pesan WA dengan variabel {nama}, {poin}, dst.
 // File ini murni logika (tanpa database) jadi aman dipakai di server maupun browser.
 
-export const TEMPLATE_KEYS = ["expiring", "inactive", "birthday"];
+export const TEMPLATE_KEYS = ["expiring", "inactive", "birthday", "promo"];
 
 // Variabel yang boleh dipakai di tiap template. Variabel di luar daftar ini
 // ditolak saat disimpan, supaya salah ketik seperti {name} tidak ikut terkirim
@@ -10,6 +10,7 @@ export const ALLOWED_VARS = {
   expiring: ["nama", "poin", "hari", "berlaku_sampai", "kode_voucher"],
   inactive: ["nama", "berlaku_sampai", "kode_voucher"],
   birthday: ["nama", "berlaku_sampai", "kode_voucher"],
+  promo: ["nama", "berlaku_sampai", "kode_voucher"],
 };
 
 export const VAR_HELP = {

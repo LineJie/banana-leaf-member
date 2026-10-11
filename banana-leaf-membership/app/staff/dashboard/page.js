@@ -93,6 +93,12 @@ export default function StaffDashboard() {
               Cek Penukaran Hadiah
             </Link>
             <Link
+              href="/staff/dashboard/broadcast"
+              className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
+            >
+              Broadcast WA
+            </Link>
+            <Link
               href="/staff/dashboard/vouchers"
               className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
             >

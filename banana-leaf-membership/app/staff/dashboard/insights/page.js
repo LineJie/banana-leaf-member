@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatDate } from "@/lib/format";
 import { MONTHS_ID } from "@/lib/time";
+import SendButton from "@/components/WaSendButton";
 
 function daysUntil(dateStr) {
   const diff = new Date(dateStr).getTime() - Date.now();
@@ -15,72 +16,6 @@ function daysSince(dateStr) {
   if (!dateStr) return null;
   const diff = Date.now() - new Date(dateStr).getTime();
   return Math.floor(diff / (24 * 60 * 60 * 1000));
-}
-
-function sentLabel(lastSent) {
-  if (!lastSent) return null;
-  const d = new Date(lastSent.sentAt);
-  const label = d.toLocaleDateString("id-ID", {
-    timeZone: "Asia/Jakarta",
-    day: "numeric",
-    month: "short",
-  });
-  return `Sudah dikirim ${label}${lastSent.sentBy ? ` oleh ${lastSent.sentBy}` : ""}`;
-}
-
-// Tombol "Chat WA": server menyiapkan pesan dari template (isi variabel, buat
-// voucher, catat ke log), lalu WhatsApp dibuka dengan pesan siap kirim.
-function SendButton({ templateKey, memberId, problem, lastSent, onSent }) {
-  const [busy, setBusy] = useState(false);
-
-  async function send(force) {
-    // Jendela dibuka sekarang (saat klik) supaya tidak diblokir browser HP,
-    // lalu diarahkan ke WhatsApp setelah pesan siap.
-    const popup = window.open("about:blank", "_blank");
-    setBusy(true);
-    try {
-      const res = await fetch("/api/campaigns/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ templateKey, memberId, force }),
-      });
-      const data = await res.json();
-      if (res.status === 409 && data.needConfirm && !force) {
-        if (popup) popup.close();
-        setBusy(false);
-        if (window.confirm(`${data.error}\n\nKirim lagi?`)) {
-          await send(true);
-        }
-        return;
-      }
-      if (!res.ok) {
-        if (popup) popup.close();
-        window.alert(data.error || "Gagal menyiapkan pesan.");
-        return;
-      }
-      if (popup) popup.location.href = data.waUrl;
-      else window.location.href = data.waUrl;
-      onSent();
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="flex flex-col items-end gap-1">
-      <button
-        onClick={() => send(false)}
-        disabled={busy || Boolean(problem)}
-        title={problem || ""}
-        className="focus-ring rounded-lg bg-green-600 px-3 py-2 font-body text-xs text-white hover:bg-green-700 disabled:opacity-40 whitespace-nowrap"
-      >
-        {busy ? "Menyiapkan..." : lastSent ? "Chat WA lagi" : "Chat WA"}
-      </button>
-      {lastSent && (
-        <span className="font-body text-[11px] text-ink/40 text-right">{sentLabel(lastSent)}</span>
-      )}
-    </div>
-  );
 }
 
 function ProblemNotice({ problem }) {
