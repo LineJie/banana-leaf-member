@@ -121,6 +121,66 @@ function MemberPicker({ selected, onPick, onUnauthorized }) {
   );
 }
 
+// Riwayat pemakaian satu voucher 'banyak orang' (dimuat saat dibuka).
+function RedemptionHistory({ voucherId, onUnauthorized }) {
+  const [open, setOpen] = useState(false);
+  const [rows, setRows] = useState(null);
+  const [error, setError] = useState("");
+
+  async function toggle() {
+    const next = !open;
+    setOpen(next);
+    if (!next) return;
+    setError("");
+    const res = await fetch(`/api/vouchers/redemptions?voucherId=${encodeURIComponent(voucherId)}`);
+    if (res.status === 401) {
+      onUnauthorized?.();
+      return;
+    }
+    const json = await res.json();
+    if (!res.ok) {
+      setError(json.error || "Gagal memuat riwayat.");
+      return;
+    }
+    setRows(json.redemptions || []);
+  }
+
+  return (
+    <div className="mt-1">
+      <button
+        type="button"
+        onClick={toggle}
+        className="focus-ring font-body text-xs text-leaf-700 hover:text-leaf-800 underline"
+      >
+        {open ? "Tutup riwayat" : "Lihat riwayat pemakaian"}
+      </button>
+      {open && (
+        <div className="mt-2 rounded-lg border border-ink/10 bg-[#fbf9f4]">
+          {error && <p className="font-body text-xs text-red-600 px-3 py-2">{error}</p>}
+          {!error && rows === null && <p className="font-body text-xs text-ink/50 px-3 py-2">Memuat...</p>}
+          {!error && rows && rows.length === 0 && (
+            <p className="font-body text-xs text-ink/40 px-3 py-2">Belum ada yang memakai.</p>
+          )}
+          {!error && rows && rows.length > 0 && (
+            <div className="divide-y divide-ink/10 max-h-60 overflow-y-auto">
+              {rows.map((r) => (
+                <p key={r.id} className="font-body text-xs text-ink px-3 py-2">
+                  <strong>{r.memberName}</strong> <span className="text-ink/40">· {r.whatsappNumber}</span>
+                  <span className="text-ink/50">
+                    {" · "}
+                    {formatDateTime(r.redeemedAt)}
+                    {r.redeemedBy ? ` · dicatat ${r.redeemedBy}` : ""}
+                  </span>
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Form buat voucher (khusus owner).
 function CreateVoucher({ onCreated, onUnauthorized }) {
   const [open, setOpen] = useState(false);
@@ -432,12 +492,20 @@ export default function VouchersPage() {
             </p>
             <h1 className="font-display text-2xl text-ink">Voucher</h1>
           </div>
-          <Link
-            href="/staff/dashboard"
-            className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
-          >
-            &larr; Kembali ke Dashboard
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Link
+              href="/staff/dashboard/voucher-report"
+              className="focus-ring font-body text-sm text-gold-600 hover:text-gold-700"
+            >
+              Laporan Voucher
+            </Link>
+            <Link
+              href="/staff/dashboard"
+              className="focus-ring font-body text-sm text-ink/50 hover:text-ink"
+            >
+              &larr; Kembali ke Dashboard
+            </Link>
+          </div>
         </div>
 
         {isOwner && <CreateVoucher onCreated={loadList} onUnauthorized={goLogin} />}
@@ -550,6 +618,9 @@ export default function VouchersPage() {
                       {v.kind === "single" && v.claimedAt ? ` · dipakai ${formatDateTime(v.claimedAt)}` : ""}
                       {v.kind === "single" && v.claimedBy ? ` oleh ${v.claimedBy}` : ""}
                     </p>
+                    {v.kind === "shared" && v.usedCount > 0 && (
+                      <RedemptionHistory voucherId={v.id} onUnauthorized={goLogin} />
+                    )}
                   </div>
                   <p className={"font-body text-xs shrink-0 " + st.cls}>{st.text}</p>
                 </div>
