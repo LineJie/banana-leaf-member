@@ -114,6 +114,14 @@ export default function StaffDashboard() {
             )}
             {me?.staffRole === "owner" && (
               <Link
+                href="/staff/dashboard/info"
+                className="focus-ring font-body text-sm text-gold-600 hover:text-gold-700"
+              >
+                Kelola Info Member
+              </Link>
+            )}
+            {me?.staffRole === "owner" && (
+              <Link
                 href="/staff/dashboard/rewards"
                 className="focus-ring font-body text-sm text-gold-600 hover:text-gold-700"
               >

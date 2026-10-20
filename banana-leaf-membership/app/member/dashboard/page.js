@@ -3,12 +3,27 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatRupiah, formatDate, daysUntil } from "@/lib/format";
+import AnnouncementCard from "@/components/AnnouncementCard";
 
 export default function MemberDashboard() {
   const router = useRouter();
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [showPinForm, setShowPinForm] = useState(false);
+  const [announcements, setAnnouncements] = useState([]);
+
+  // Info/promo dari owner. Dimuat terpisah dan gagal diam-diam: kalau error,
+  // poin dan riwayat member tetap tampil seperti biasa.
+  async function loadAnnouncements() {
+    try {
+      const res = await fetch("/api/member/announcements");
+      if (!res.ok) return;
+      const json = await res.json();
+      setAnnouncements(json.announcements || []);
+    } catch {
+      /* abaikan */
+    }
+  }
 
   async function load() {
     const res = await fetch("/api/member/me");
@@ -21,6 +36,7 @@ export default function MemberDashboard() {
 
   useEffect(() => {
     load();
+    loadAnnouncements();
   }, []);
 
   async function handleLogout() {
@@ -89,6 +105,21 @@ export default function MemberDashboard() {
             </p>
           )}
         </div>
+
+        {announcements.length > 0 && (
+          <div className="mb-6 space-y-4">
+            {announcements.map((a) => (
+              <AnnouncementCard
+                key={a.id}
+                title={a.title}
+                body={a.body}
+                imageUrl={a.imageUrl}
+                buttonLabel={a.buttonLabel}
+                buttonUrl={a.buttonUrl}
+              />
+            ))}
+          </div>
+        )}
 
         {data.batches.length > 0 && (
           <div className="mb-6">

@@ -16,6 +16,9 @@ export async function middleware(request) {
     if (pathname.startsWith("/staff/dashboard/templates") && session.staffRole !== "owner") {
       return NextResponse.redirect(new URL("/staff/dashboard", request.url));
     }
+    if (pathname.startsWith("/staff/dashboard/info") && session.staffRole !== "owner") {
+      return NextResponse.redirect(new URL("/staff/dashboard", request.url));
+    }
     if (pathname.startsWith("/staff/dashboard/staff") && session.staffRole !== "owner") {
       return NextResponse.redirect(new URL("/staff/dashboard", request.url));
     }
