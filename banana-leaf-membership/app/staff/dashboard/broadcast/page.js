@@ -12,8 +12,8 @@ const AUDIENCES = [
 ];
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-// Sama dengan jeda cegah-kirim-dobel di server (RESEND_COOLDOWN_DAYS = 7).
-const DONE_WINDOW_DAYS = 7;
+// Sama dengan jeda cegah-kirim-dobel di server (RESEND_COOLDOWN_DAYS = 14).
+const DONE_WINDOW_DAYS = 14;
 
 export default function BroadcastPage() {
   const router = useRouter();
