@@ -3,7 +3,7 @@ import { randomInt } from "crypto";
 import { needsValidity } from "@/lib/template";
 import { todayWib } from "@/lib/time";
 
-export const RESEND_COOLDOWN_DAYS = 7;
+export const RESEND_COOLDOWN_DAYS = 14;
 export const EXPIRY_WARNING_DAYS = 10;
 
 // Kalau template belum siap dikirim (mis. tanggal berlaku kosong/sudah lewat),
